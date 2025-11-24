@@ -1,0 +1,4 @@
+id,name,biome,attribute,hp,atk,def,agi,exp_reward,image
+901,오니(하급),DemonSlayer,Dark,80,15,5,8,10,oni_low.png
+902,굼바,Mario,Earth,50,10,2,5,5,goomba.png
+903,꼬렛,Pokemon,Nature,60,12,3,12,7,rattata.png
