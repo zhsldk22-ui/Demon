@@ -1,92 +1,151 @@
-import pygame
-import random
-from config import *
-
-class Fighter:
-    """전투에 참여하는 개별 캐릭터/몬스터 객체"""
-    def __init__(self, x, y, name, is_enemy, hp, max_hp, image_path=None):
-        self.rect = pygame.Rect(x, y, 100, 100) # 캐릭터 크기 (100x100)
-        self.name = name
-        self.is_enemy = is_enemy
-        self.hp = hp
-        self.max_hp = max_hp
-        self.image = None
-        
-        # 이미지 로딩 시도 (없으면 색깔 사각형으로 대체)
-        if image_path:
-            try:
-                # assets/images/ 경로에서 로드
-                full_path = os.path.join(ASSETS_DIR, "images", image_path)
-                loaded_img = pygame.image.load(full_path)
-                self.image = pygame.transform.scale(loaded_img, (100, 100))
-            except:
-                self.image = None # 로드 실패 시 None
-
-    def draw(self, screen):
-        # 1. 캐릭터 본체 그리기
-        if self.image:
-            screen.blit(self.image, self.rect)
-        else:
-            # 이미지가 없으면 아군은 파랑, 적군은 빨강 사각형
-            color = RED if self.is_enemy else BLUE
-            pygame.draw.rect(screen, color, self.rect)
-            
-            # 이름 표시 (이미지 없을 때 구분용)
-            font = pygame.font.SysFont("malgungothic", 12)
-            name_surf = font.render(self.name, True, WHITE)
-            screen.blit(name_surf, (self.rect.x, self.rect.y + 40))
-
-        # 2. HP 바 그리기 (머리 위)
-        bar_width = 100
-        bar_height = 10
-        fill_width = int((self.hp / self.max_hp) * bar_width)
-        
-        # 배경바 (회색)
-        pygame.draw.rect(screen, GRAY, (self.rect.x, self.rect.y - 15, bar_width, bar_height))
-        # 체력바 (초록)
-        pygame.draw.rect(screen, GREEN, (self.rect.x, self.rect.y - 15, fill_width, bar_height))
-        # 테두리 (검정)
-        pygame.draw.rect(screen, WHITE, (self.rect.x, self.rect.y - 15, bar_width, bar_height), 1)
-
 class BattleScene:
-    """전투 화면 전체를 관리하는 매니저"""
     def __init__(self, screen):
         self.screen = screen
         self.fighters = []
-        self.setup_battle()
-        
-        # 폰트
+        self.turn_queue = []
+        self.turn_timer = 0
+        self.log_message = "전투 시작!"
         self.font = pygame.font.SysFont("malgungothic", 20)
+        
+        self.battle_state = "FIGHTING" 
+        self.reward_popup = RewardPopup()
+        
+        self.floor = 1 
+        
+        # [NEW] 파티 데이터를 별도로 관리 (전투가 끝나도 유지되도록)
+        self.party_data = []
+        self.init_party() # 1층 시작 전 파티 초기화
+        
+        self.setup_battle()
+
+    def init_party(self):
+        """게임 시작 시 최초 파티 구성 (나중엔 로비에서 가져와야 함)"""
+        # 딕셔너리 형태로 상태 관리
+        self.party_data = [
+            {"name": "마리오", "hp": 120, "max_hp": 120, "atk": 20, "agi": 10, "img": "mario.png"},
+            {"name": "탄지로", "hp": 150, "max_hp": 150, "atk": 25, "agi": 15, "img": "tanjiro.png"},
+            {"name": "피카츄", "hp": 100, "max_hp": 100, "atk": 35, "agi": 25, "img": "pikachu.png"}
+        ]
+
+    def save_party_status(self):
+        """전투 종료 후 현재 체력을 party_data에 저장"""
+        for fighter in self.fighters:
+            if not fighter.is_enemy: # 아군인 경우만
+                # 이름으로 매칭해서 데이터 업데이트
+                for data in self.party_data:
+                    if data["name"] == fighter.name:
+                        data["hp"] = fighter.hp # 현재 남은 체력 저장
+                        break
 
     def setup_battle(self):
-        """DB에서 데이터를 가져와 아군/적군 배치 (지금은 더미 데이터)"""
+        """전투 초기화"""
         self.fighters.clear()
-        
-        # 아군 배치 (왼쪽: x=200 근처)
-        # 나중에는 DB의 inventory에서 선택된 3명을 가져와야 함
-        self.fighters.append(Fighter(200, 200, "마리오", False, 100, 100, "mario.png"))
-        self.fighters.append(Fighter(150, 350, "탄지로", False, 150, 150, "tanjiro.png"))
-        self.fighters.append(Fighter(200, 500, "피카츄", False, 80, 80, "pikachu.png"))
+        self.battle_state = "FIGHTING"
+        self.log_message = f"{self.floor}층 - 적이 나타났다!"
 
-        # 적군 배치 (오른쪽: x=900 근처)
-        # 나중에는 DB의 enemies 테이블에서 biome에 맞는 적을 랜덤 로드
-        self.fighters.append(Fighter(900, 200, "오니1", True, 80, 80, "oni_low.png"))
-        self.fighters.append(Fighter(950, 350, "오니 대장", True, 200, 200, "oni_boss.png"))
-        self.fighters.append(Fighter(900, 500, "오니2", True, 80, 80, "oni_low.png"))
+        # [NEW] 저장된 party_data를 기반으로 아군 생성
+        for data in self.party_data:
+            # 죽은 캐릭터(HP 0)는 체력 1로 부활? 아니면 제외? -> 일단 1로 부활시켜서 데려감 (로그라이크 힐 선택 유도)
+            current_hp = data["hp"] if data["hp"] > 0 else 1 
+            
+            f = Fighter(200, 200 + (self.party_data.index(data)*150), # Y좌표 자동 배치 
+                        data["name"], False, 
+                        current_hp, data["max_hp"], # 현재HP, 최대HP
+                        data["atk"], data["agi"], 
+                        data["img"])
+            self.fighters.append(f)
+
+        # 적군 (층수에 비례해 강해짐)
+        hp_bonus = (self.floor - 1) * 20
+        atk_bonus = (self.floor - 1) * 3
+        
+        # 10층 단위 보스전 로직 (간단 구현)
+        if self.floor % 10 == 0:
+            self.fighters.append(Fighter(900, 350, f"{self.floor}층 보스", True, 500+hp_bonus, 500+hp_bonus, 30+atk_bonus, 10, "oni_boss.png"))
+            self.log_message = f"!!! {self.floor}층 보스 출현 !!!"
+        else:
+            # 일반 몬스터 2~3마리 랜덤 등장
+            enemy_count = random.randint(2, 3)
+            for i in range(enemy_count):
+                y_pos = 200 + i * 150
+                self.fighters.append(Fighter(900, y_pos, f"적 {i+1}", True, 80+hp_bonus, 80+hp_bonus, 10+atk_bonus, 8, "oni_low.png"))
+        
+        self.turn_queue = sorted(self.fighters, key=lambda f: f.agi, reverse=True)
+
+    def get_alive_targets(self, is_enemy_team):
+        return [f for f in self.fighters if f.is_enemy == is_enemy_team and not f.is_dead]
+
+    def process_reward(self, reward_code):
+        print(f"[System] 보상 선택: {reward_code}")
+        
+        # [NEW] 보상 효과를 party_data에 영구 적용
+        for data in self.party_data:
+            if reward_code == "REWARD_HEAL":
+                # 30% 회복 (단, MaxHP 넘지 않게)
+                heal_amount = int(data["max_hp"] * 0.3)
+                data["hp"] = min(data["hp"] + heal_amount, data["max_hp"])
+            
+            elif reward_code == "REWARD_HP_UP":
+                data["max_hp"] += 20
+                data["hp"] += 20 # 늘어난 만큼 현재 체력도 회복
+            
+            elif reward_code == "REWARD_ATK_UP":
+                data["atk"] += 5
+
+        self.floor += 1
+        self.setup_battle() 
 
     def update(self):
-        """전투 로직 업데이트 (턴 계산 등) - Phase 3-2에서 구현"""
-        pass
+        if self.battle_state == "VICTORY": return
+
+        for f in self.fighters: f.update()
+        
+        alive_allies = self.get_alive_targets(False)
+        alive_enemies = self.get_alive_targets(True)
+        
+        if not alive_allies:
+            self.battle_state = "DEFEAT"
+            self.log_message = f"패배... {self.floor}층에서 전멸했습니다."
+            return
+
+        if not alive_enemies:
+            if self.battle_state != "VICTORY":
+                self.battle_state = "VICTORY"
+                self.save_party_status() # [중요] 승리 확정 시 현재 체력 저장!
+            return
+
+        # 턴 로직
+        self.turn_timer += 1
+        if self.turn_timer < 30: return 
+        
+        if not self.turn_queue:
+            self.turn_queue = sorted([f for f in self.fighters if not f.is_dead], key=lambda f: f.agi, reverse=True)
+        if not self.turn_queue: return 
+
+        attacker = self.turn_queue.pop(0)
+        if attacker.is_dead: return
+
+        targets = self.get_alive_targets(not attacker.is_enemy)
+        if targets:
+            target = random.choice(targets)
+            damage = attacker.atk
+            target.take_damage(damage)
+            attacker.attack_animation()
+            self.log_message = f"{attacker.name}의 공격! > {target.name} {damage} 피해"
+            self.turn_timer = 0
+            
+    # handle_event와 draw는 기존과 동일하게 유지
+    def handle_event(self, event):
+        if self.battle_state == "VICTORY":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                reward = self.reward_popup.handle_click(event.pos)
+                if reward: self.process_reward(reward)
 
     def draw(self):
-        """전투 화면 그리기"""
-        # 배경 (어두운 회색)
         self.screen.fill((30, 30, 30))
-        
-        # UI: VS 글자
-        vs_surf = self.font.render("--- BATTLE START ---", True, WHITE)
-        self.screen.blit(vs_surf, (SCREEN_WIDTH//2 - 100, 50))
-
-        # 모든 캐릭터 그리기
-        for fighter in self.fighters:
-            fighter.draw(self.screen)
+        floor_surf = self.font.render(f"현재 층: {self.floor}F", True, (255, 255, 0))
+        self.screen.blit(floor_surf, (20, 20))
+        msg_surf = self.font.render(self.log_message, True, WHITE)
+        self.screen.blit(msg_surf, (SCREEN_WIDTH//2 - 150, 50))
+        for fighter in self.fighters: fighter.draw(self.screen)
+        if self.battle_state == "VICTORY": self.reward_popup.draw(self.screen)

@@ -76,6 +76,7 @@ def main():
             if battle_scene:
                 battle_scene.update() # 로직 계산
                 battle_scene.draw()   # 화면 출력
+                battle_scene.handle_event(event)
 
         pygame.display.flip()
         clock.tick(FPS)
