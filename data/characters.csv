@@ -1,4 +1,4 @@
 id,name,origin,grade,attribute,hp,mp,sp_max,atk,def,agi,image
-101,탄지로,DemonSlayer,Rare,Water,150,50,100,25,10,15,tanjiro.png
-201,마리오,Nintendo,Common,Fire,120,30,80,20,12,10,mario.png
-301,피카츄,Pokemon,Special,Electric,100,80,120,35,5,25,pikachu.png
+101,탄지로,DemonSlayer,Rare,Water,150,50,100,25,10,15,tanjiro.jpg
+201,마리오,Nintendo,Common,Fire,120,30,80,20,12,10,mario.jpg
+301,피카츄,Pokemon,Special,Electric,100,80,120,35,5,25,pikachu.jpg
