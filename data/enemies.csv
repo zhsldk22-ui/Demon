@@ -24,12 +24,12 @@ id,name,biome,tier,attribute,hp,atk,def,agi,exp_reward,image
 2005,뽀꾸뽀꾸,Mario,2,Water,60,18,8,20,11,cheep_cheep.png
 2006,헤이호,Mario,1,Grass,65,16,10,18,12,shy_guy.png
 2007,부끄부끄,Mario,2,Wind,50,22,5,30,15,boo.png
-2008,쿵쿵,Mario,2,Earth,120,40,30,5,18,thwomp.png
+2008,쿵쿵,Mario,1,Earth,120,40,30,5,18,thwomp.png
 2009,징오징오,Mario,3,Water,75,20,10,22,14,blooper.png
 2010,뻐끔플라워,Mario,1,Grass,80,25,10,5,15,piranha_plant.png
-2051,부웅부웅,Mario,1,Wind,300,50,30,25,100,boom_boom.png
+2051,부웅부웅,Mario,2,Wind,300,50,30,25,100,boom_boom.png
 2052,킹폭탄,Mario,2,Fire,350,60,40,10,120,king_bob_omb.png
-2053,뻐끔왕,Mario,1,Grass,320,55,25,20,110,petey_piranha.png
+2053,뻐끔왕,Mario,2,Grass,320,55,25,20,110,petey_piranha.png
 2054,킹부끄,Mario,2,Star,280,70,10,40,130,king_boo.png
 2081,마귀,Mario,3,Star,450,90,30,35,200,kamek.png
 2082,쿠파주니어,Mario,2,Electric,500,80,50,40,250,bowser_jr.png
@@ -46,7 +46,7 @@ id,name,biome,tier,attribute,hp,atk,def,agi,exp_reward,image
 3009,장크로다일,Pokemon,3,Water,240,65,45,15,85,feraligatr.png
 3010,피카츄,Pokemon,1,Electric,70,35,5,40,25,pikachu.png
 3011,라이츄,Pokemon,2,Electric,150,60,20,45,60,raichu.png
-3051,프리져,Pokemon,1,Water,350,70,40,30,150,articuno.png
+3051,프리져,Pokemon,2,Water,350,70,40,30,150,articuno.png
 3052,썬더,Pokemon,2,Electric,340,80,30,50,150,zapdos.png
 3053,파이어,Pokemon,2,Fire,350,85,35,35,150,moltres.png
 3081,제크로무,Pokemon,3,Electric,550,110,60,40,300,zekrom.png

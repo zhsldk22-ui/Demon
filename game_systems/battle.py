@@ -4,6 +4,7 @@ import sqlite3
 import os
 from config import *
 from ui.components import Button
+from game_systems.stage_manager import StageManager 
 
 class Fighter:
     """전투 객체 (캐릭터 및 적)"""
@@ -31,7 +32,6 @@ class Fighter:
                     print(f"[Error] 이미지 로드 실패 ({image_path}): {e}")
                     self.image = None
             else:
-                # 이미지가 없으면 그냥 None 처리 (사각형 그려짐)
                 self.image = None
 
     def take_damage(self, damage):
@@ -136,6 +136,9 @@ class BattleScene:
         
         self.party_data = []
         self.mode = "NORMAL" # NORMAL or TUTORIAL
+        
+        # [NEW] 스테이지 매니저 연동
+        self.stage_manager = StageManager()
 
         # 파티 초기화 및 전투 설정
         self.init_party()
@@ -196,43 +199,99 @@ class BattleScene:
                         break
 
     def setup_battle(self):
-        """아군 및 적군 배치"""
+        """적군 생성 로직 (DB + StageManager 연동)"""
         self.fighters.clear()
         self.battle_state = "FIGHTING"
         
         # 1. 아군 배치
         for idx, data in enumerate(self.party_data):
             current_hp = data["hp"] if data["hp"] > 0 else 1 
-            f = Fighter(200, 200 + (idx * 150), 
-                        data["name"], False, 
-                        current_hp, data["max_hp"], 
-                        data["atk"], data["agi"], 
-                        data["image"])
+            f = Fighter(200, 200 + (idx * 150), data["name"], False, 
+                        current_hp, data["max_hp"], data["atk"], data["agi"], data["image"])
             self.fighters.append(f)
 
-        # 2. 적군 배치
+        # 2. 적군 배치 (튜토리얼 분기)
         if self.mode == "TUTORIAL":
-            # [튜토리얼] 최종 보스 (필패 이벤트)
             self.log_message = "!!! 경고: 강력한 적이 나타났다 !!!"
             boss = Fighter(900, 350, "최종 보스", True, 50000, 50000, 9999, 10, "oni_boss.png")
             self.fighters.append(boss)
+            self.turn_queue = sorted(self.fighters, key=lambda f: f.agi, reverse=True)
+            return
+
+        # 3. 적군 배치 (일반 모드 - DB 연동)
+        stage_info = self.stage_manager.get_stage_info(self.floor)
+        biome = stage_info['biome']
+        tier = stage_info['tier']
         
-        else:
-            # [일반] 층수에 따른 적 생성
-            hp_bonus = (self.floor - 1) * 20
-            atk_bonus = (self.floor - 1) * 3
-            
-            if self.floor % 10 == 0:
-                self.log_message = f"!!! {self.floor}층 보스 출현 !!!"
-                self.fighters.append(Fighter(900, 350, f"{self.floor}층 보스", True, 500+hp_bonus*2, 500+hp_bonus*2, 30+atk_bonus, 10, "oni_boss.png"))
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        enemies_to_spawn = []
+
+        try:
+            # A. 고정 보스 (91, 95, 100층)
+            if stage_info['fixed_boss_id']:
+                cursor.execute("SELECT * FROM enemies WHERE id=?", (stage_info['fixed_boss_id'],))
+                boss_data = cursor.fetchone()
+                if boss_data:
+                    enemies_to_spawn.append(boss_data)
+                    self.log_message = f"!!! {boss_data[1]} 출현 !!!"
+
+            # B. 일반 10층 단위 보스
+            elif stage_info['is_boss_floor']:
+                # 해당 바이옴의 보스급(현재 티어보다 높은 몹) 혹은 같은 티어 중 랜덤
+                cursor.execute("""
+                    SELECT * FROM enemies 
+                    WHERE biome=? AND tier >= ? 
+                    ORDER BY RANDOM() LIMIT 1
+                """, (biome, tier))
+                boss_data = cursor.fetchone()
+                if boss_data:
+                    # 보스 보정 (HP 2배)
+                    boss_list = list(boss_data)
+                    boss_list[5] *= 2 # HP index 5
+                    enemies_to_spawn.append(boss_list)
+                    self.log_message = f"!!! {self.floor}층 보스: {boss_data[1]} !!!"
+
+            # C. 일반 전투
             else:
-                self.log_message = f"{self.floor}층 - 적이 나타났다!"
-                enemy_count = random.randint(2, 3)
-                for i in range(enemy_count):
-                    y_pos = 200 + i * 150
-                    self.fighters.append(Fighter(900, y_pos, f"적 {i+1}", True, 80+hp_bonus, 80+hp_bonus, 10+atk_bonus, 8, "oni_low.png"))
+                self.log_message = f"{self.floor}층 [{biome}] - 적 출현"
+                count = random.randint(2, 3)
+                cursor.execute("""
+                    SELECT * FROM enemies 
+                    WHERE biome=? AND tier=? 
+                    ORDER BY RANDOM() LIMIT ?
+                """, (biome, tier, count))
+                enemies_to_spawn = cursor.fetchall()
+
+        except Exception as e:
+            print(f"[Error] 적 생성 실패: {e}")
+        finally:
+            conn.close()
+
+        # 4. 적 객체 생성 및 스탯 스케일링
+        # DB 컬럼 순서: id(0), name(1), biome(2), tier(3), attribute(4), hp(5), atk(6), def(7), agi(8), exp(9), image(10)
+        scale_factor = 1 + (self.floor - 1) * 0.05 # 층당 5% 강해짐
         
-        # 턴 순서 결정 (AGI 내림차순)
+        for i, e_data in enumerate(enemies_to_spawn):
+            name = e_data[1]
+            # 스탯 보정
+            max_hp = int(e_data[5] * scale_factor)
+            atk = int(e_data[6] * scale_factor)
+            agi = int(e_data[8]) 
+            
+            # 위치 배정
+            if len(enemies_to_spawn) == 1: # 보스 1명
+                y_pos = 350
+            else: # 쫄병 여러명
+                y_pos = 200 + i * 150
+            
+            # 이미지 파일명 (마지막 컬럼)
+            img_file = e_data[10] if len(e_data) > 10 else None
+            
+            f = Fighter(900, y_pos, name, True, max_hp, max_hp, atk, agi, img_file)
+            self.fighters.append(f)
+        
         self.turn_queue = sorted(self.fighters, key=lambda f: f.agi, reverse=True)
 
     def get_alive_targets(self, is_enemy_team):
@@ -315,7 +374,6 @@ class BattleScene:
         # 패배 시 로비로 돌아가기 (클릭 시)
         elif self.battle_state == "DEFEAT":
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # main.py에서 이 값을 확인하여 로비로 전환함
                 pass 
 
     def draw(self):
