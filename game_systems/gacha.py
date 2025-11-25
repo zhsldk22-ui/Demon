@@ -1,18 +1,12 @@
 import sqlite3
 import random
-import sys
-import os
-
-# [수정] 부모 폴더(프로젝트 루트)를 파이썬 검색 경로에 추가
-# 이렇게 해야 상위 폴더에 있는 config.py를 불러올 수 있습니다.
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from config import DB_PATH
 
 class GachaManager:
     # 요청하신 확률 설정 (단위: %)
     GACHA_RATES = {
-        "MYTHIC": 0.2,   # 신화 (엄마, 아빠, 아들)
+        "MYTHIC": 0.2,   # 신화 (엄마, 아빠, 서호)
         "LEGEND": 2.8,   # 전설 (3.0% 누적)
         "SPECIAL": 5.0,  # 특별 (8.0% 누적)
         "RARE": 32.0,    # 희귀 (40.0% 누적)
@@ -54,6 +48,27 @@ class GachaManager:
             print(f"[Error] 가챠 풀 로드 실패: {e}")
         finally:
             conn.close()
+
+    def draw_1(self, user_id="son_01"):
+        """1회 뽑기 실행 및 인벤토리 저장"""
+        results = []
+        
+        # 확률에 따른 뽑기 로직
+        grades = list(self.GACHA_RATES.keys())
+        weights = list(self.GACHA_RATES.values())
+
+        # 1단계: 등급 결정
+        selected_grade = random.choices(grades, weights=weights, k=1)[0]
+        
+        # 2단계: 해당 등급 내 캐릭터 선택
+        if not self.pool[selected_grade]:
+            selected_grade = "COMMON"
+        
+        char_info = random.choice(self.pool[selected_grade])
+        results.append(char_info)
+
+        self._save_to_inventory(user_id, results)
+        return results
 
     def draw_10(self, user_id="son_01"):
         """10연차 뽑기 실행 및 인벤토리 저장"""

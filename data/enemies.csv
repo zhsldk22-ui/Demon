@@ -44,6 +44,6 @@ id,name,biome,tier,role,attribute,hp,atk,def,agi,exp_reward,image
 3052,썬더,Pokemon,3,BOSS,Electric,420,90,45,80,270,zapdos.png
 3053,파이어,Pokemon,3,BOSS,Fire,450,100,40,75,300,moltres.png
 3054,뮤츠,Pokemon,3,BOSS,Psychic,800,140,50,90,450,mewtwo.png
-9090,중간 보스,Final,3,BOSS,Dark,1500,120,80,70,800,mid_boss.png
-9095,진 중간 보스,Final,3,BOSS,Dark,2500,180,120,90,1500,true_mid_boss.png
-9100,마왕 무잔,Final,3,BOSS,Dark,5000,300,200,100,9999,muzan.png
+9090,어둠의 서호,Final,3,BOSS,Dark,1500,120,80,70,800,dark_son.png
+9095,어둠의 아빠,Final,3,BOSS,Dark,2500,180,120,90,1500,dark_father.png
+9100,어둠의 엄마,Final,3,BOSS,Dark,5000,300,200,100,9999,dark_mother.png

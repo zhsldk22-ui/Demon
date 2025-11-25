@@ -2,15 +2,21 @@ import pygame
 from config import *
 
 class Button:
-    def __init__(self, x, y, width, height, text, action_code):
+    def __init__(self, x, y, width, height, text, action_code, color=None, hover_color=None):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.action_code = action_code
         self.font = pygame.font.SysFont("malgungothic", 24, bold=True)
         self.is_hovered = False
+        
+        # [수정] 색상 인자 추가
+        self.color = color if color else (50, 50, 200)
+        self.hover_color = hover_color if hover_color else (100, 100, 255)
 
     def draw(self, screen):
-        color = (100, 100, 255) if self.is_hovered else (50, 50, 200)
+        # [수정] 인스턴스 색상 사용
+        color = self.hover_color if self.is_hovered else self.color
+        
         pygame.draw.rect(screen, color, self.rect, border_radius=10)
         pygame.draw.rect(screen, WHITE, self.rect, 2, border_radius=10)
 

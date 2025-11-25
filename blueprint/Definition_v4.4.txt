@@ -1,12 +1,12 @@
-📁 DGFS (Dad's Game For Son) 프로젝트 정의서 (Ver 4.3)
+📁 DGFS (Dad's Game For Son) 프로젝트 정의서 (Ver 4.4)
 1. 개요 (Overview)
-프로젝트명: DGFS (Dad's Game For Son) - 귀멸의 로그라이크
+프로젝트명: DGFS (Dad's Game For Son) - Seoho ROGUE
 개발자: 아빠 (Admin & Developer)
 주요 사용자: 초등학교 3학년 아들 (Player)
 플랫폼: 아들 개인 노트북 (Local) 구동 [Window 기반 실행 파일(.exe) 배포]
 개발 언어: Python 3.12 (PyGame, SQLite, Pandas)
 개발 도구: VS Code, GitHub Desktop, PyInstaller
-버전: Ver 4.3 (Phase 3.7 - Skill System & Polishing)
+버전: Ver 4.4 (Phase 3.8 - System Stabilization & UI/UX)
 2. 기획 의도 및 컨셉
 2.1. 핵심 재미 (Core Loop): 로그라이크 등반 (Roguelike Climbing)
 수집 (Collection): 귀멸의 칼날, 닌텐도, 포켓몬 등 다양한 IP의 캐릭터를 '뽑기(Gacha)'로 수집하여 나만의 파티 구성.
@@ -15,6 +15,8 @@ AGI(민첩) 시스템: 속도가 빠른 순서대로 행동 턴을 잡는 '턴 �
 오토 배틀: 아들은 파티 구성에 집중하고, 전투는 캐릭터 AI(자동 공격/스킬)로 진행.
 로그라이크 룰 (Hardcore Rules):
 상태 유지 (Persistence): 층 이동 시 HP 상태가 그대로 유지됨.
+ 이어하기 (Continue): 전투 승리 후 '저장하고 나가기'를 통해 현재 층, 캐릭터 스탯(HP, MP, SP, 강화)을 저장하고 이어서 플레이 가능.
+ 새로 하기 (New Game): '새로 하기' 선택 시, 모든 진행 상황(층, 스탯)이 초기화되고 기본 캐릭터 2명으로 1층부터 다시 시작.
 사망 패널티 (Permadeath): 일반 층에서 사망한 캐릭터는 해당 챕터(10층 단위) 동안 부활 불가.
 완전 회복 (Full Restore): 10층 단위 보스 클리어 시, 사망자를 포함한 파티 전원 부활 및 HP 100% 회복.
 탐험 (Exploration):
@@ -30,29 +32,30 @@ AGI(민첩) 시스템: 속도가 빠른 순서대로 행동 턴을 잡는 '턴 �
 3.1. 기술 스택
 Engine: pygame (2D 그래픽 렌더링, 프레임 단위 제어)
 Database: sqlite3 (인게임 저장) + CSV (기획 데이터 관리)
-Library: pandas (CSV 데이터를 DB로 자동 마이그레이션)
+Library: pandas (CSV 데이터를 DB로 자동 마이그레이션) 
 3.2. 폴더 및 파일 구조 (현행화)
 Plaintext
 DGFS_RPG/
-├── main.py              # 게임 진입점 (Scene Manager: 로비/전투/쿠폰/가챠/덱보기 상태 관리)
+├── main.py              # 게임 진입점 (Scene Manager: 로비/전투/쿠폰/소환상점/덱보기 등 게임의 전체 상태(State) 및 UI 흐름 관리)
 ├── config.py            # 해상도, 색상, 시스템 경로 상수
 ├── database.py          # CSV(data폴더)를 읽어 SQLite DB 구축 및 스키마 관리
 ├── data/                # 기획 데이터 (Master Data)
 │   ├── characters.csv   # 아군 캐릭터 스탯 및 등급 정의
 │   └── enemies.csv      # 적군 정보 (Tier, Role, Biome 포함)
 ├── assets/              # 리소스 폴더 (images, fonts)
-├── game_systems/        # 핵심 로직 모듈
+├── game_systems/        # 핵심 로직 모듈 (Game Logic)
 │   ├── battle.py        # [핵심] 2:2 전투 로직, 턴 큐, 사망/부활 처리
 │   ├── stage_manager.py # [New] 바이옴 셔플 및 적 생성(Tier) 로직 관리
 │   ├── gacha.py         # [New] 확률 기반 캐릭터 뽑기 및 인벤토리 저장
 │   └── coupon.py        # 오프라인 쿠폰 검증 알고리즘
-└── ui/                  # UI 컴포넌트 (Button, InputBox)
+└── ui/                  # UI 컴포넌트 (UI Library)
+    └── components.py    # Button, InputBox 등 재사용 가능한 UI 클래스
 
 4. 데이터베이스 설계 (Database Schema)
 데이터 주도 개발(Data-Driven): csv 파일을 마스터 데이터로 사용한다.
-Users: 사용자 정보, 보유 재화(Tickets), 최고 도달 층수.
+Users: 사용자 정보, 보유 재화(Tickets), 현재 진행 층수(current_floor).
 Characters (아군 도감): id, name, grade (Mythic~Common), stats, image, description(기술명).
-Inventory (보유 현황): 유저 보유 캐릭터. is_selected (덱 장착 여부) 컬럼 추가.
+Inventory (보유 현황): 유저 보유 캐릭터. is_selected (덱 장착 여부), current_hp, current_mp, current_sp, current_atk, current_max_hp 등 현재 상태 저장 컬럼 추가.
 Enemies (적군 도감):
 id, name, biome, stats, image.
 tier: 난이도 등급 (1~3).
@@ -73,13 +76,15 @@ Phase 2 (UI & Lobby) [완료]: 메인 로비, 덱 보기(Deck View) UI.
 Phase 3 (Basic Battle) [완료]: 턴제 전투, 보상 시스템, 로그라이크 루프.
 Phase 3.5 (Data Binding & Economy) [완료]:
 DB 연동(Inventory), 가챠 시스템(Gacha), 덱 선택(Select) 구현.
-Phase 3.6 (Balance & Logic) [완료]:
+Phase 3.6 (Roguelike Core) [완료]:
 바이옴 셔플(StageManager), 티어(Tier) 시스템.
 사망 패널티(Permadeath) 및 보스 클리어 시 완전 회복 구현.
 2:2 전투 인원 조정.
-Phase 3.7 (Skill System) [진행 중 - Current]:
+Phase 3.7 (Skill System & Polishing) [완료]:
 MP 기반 액티브 스킬(Active Skill) 구현.
 SP 기반 필살기(Ultimate) 및 컷신/연출 강화.
-Phase 4 (Visuals & Assets) [진행 중]: 사각형 대체 및 애니메이션(Tweening) 강화.
-Phase 5 (Distribution) [예정]: 사운드 적용 및 .exe 패키징.
-
+Phase 3.8 (System Stabilization & UI/UX) [진행 중 - Current]:
+ '새로 시작'/'이어하기' 기능 구현 및 게임 상태 저장/불러오기 로직 안정화.
+ 소환 상점 UI/UX 개선 및 화면 흐름 재정의.
+Phase 4 (Leveling System & Visuals) [예정]: 중복 캐릭터 획득 시 레벨업 시스템 도입, 사운드 적용 및 시각 효과 강화.
+Phase 5 (Distribution) [예정]: .exe 패키징 및 배포.
