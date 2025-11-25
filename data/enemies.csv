@@ -1,65 +1,49 @@
-id,name,biome,tier,attribute,hp,atk,def,agi,exp_reward,image
-1001,하급 오니,DemonSlayer,1,Earth,50,12,5,10,10,oni_low.png
-1002,중급 오니,DemonSlayer,1,Wind,80,18,8,15,15,oni_mid.png
-1003,상급 오니,DemonSlayer,2,Electric,120,25,12,20,25,oni_high.png
-1011,하현6 카마누에,DemonSlayer,1,Wind,150,30,15,25,50,kamanue.png
-1012,하현5 루이,DemonSlayer,1,Grass,180,35,15,30,60,rui.png
-1013,하현4 무카고,DemonSlayer,1,Earth,160,30,25,20,50,mukago.png
-1014,하현3 와쿠라바,DemonSlayer,1,Wind,170,35,10,40,60,wakuraba.png
-1015,하현2 로쿠로,DemonSlayer,1,Earth,200,40,30,15,70,rokuro.png
-1016,하현1 엔무,DemonSlayer,2,Star,250,45,20,35,100,enmu.png
-1021,상현6 다키/규타로,DemonSlayer,2,Water,350,60,30,40,150,daki_gyutaro.png
-1022,상현5 굣코,DemonSlayer,2,Water,380,65,35,30,160,gyokko.png
-1023,상현4 한텐구,DemonSlayer,2,Wind,400,55,40,35,170,hantengu.png
-1024,신 상현6 카이가쿠,DemonSlayer,2,Electric,360,70,25,50,160,kaigaku.png
-1025,신 상현4 나키메,DemonSlayer,3,Star,420,50,80,20,180,nakime.png
-1026,상현3 아카자,DemonSlayer,3,Fire,500,90,50,60,250,akaza.png
-1027,상현2 도우마,DemonSlayer,3,Water,550,95,55,55,280,douma.png
-1028,상현1 코쿠시보,DemonSlayer,3,Star,650,110,70,70,350,kokushibo.png
-1099,키부츠지 무잔,DemonSlayer,3,Star,1000,150,100,80,999,muzan.png
-2001,굼바,Mario,1,Earth,60,15,5,10,10,goomba.png
-2002,엉금엉금,Mario,1,Water,70,18,15,12,12,koopa_troopa.png
-2003,가시돌이,Mario,2,Earth,65,20,25,8,13,spiny.png
-2004,폭탄병,Mario,2,Fire,55,30,5,15,14,bob_omb.png
-2005,뽀꾸뽀꾸,Mario,2,Water,60,18,8,20,11,cheep_cheep.png
-2006,헤이호,Mario,1,Grass,65,16,10,18,12,shy_guy.png
-2007,부끄부끄,Mario,2,Wind,50,22,5,30,15,boo.png
-2008,쿵쿵,Mario,1,Earth,120,40,30,5,18,thwomp.png
-2009,징오징오,Mario,3,Water,75,20,10,22,14,blooper.png
-2010,뻐끔플라워,Mario,1,Grass,80,25,10,5,15,piranha_plant.png
-2051,부웅부웅,Mario,2,Wind,300,50,30,25,100,boom_boom.png
-2052,킹폭탄,Mario,2,Fire,350,60,40,10,120,king_bob_omb.png
-2053,뻐끔왕,Mario,2,Grass,320,55,25,20,110,petey_piranha.png
-2054,킹부끄,Mario,2,Star,280,70,10,40,130,king_boo.png
-2081,마귀,Mario,3,Star,450,90,30,35,200,kamek.png
-2082,쿠파주니어,Mario,2,Electric,500,80,50,40,250,bowser_jr.png
-2083,마담 브루드,Mario,3,Star,600,70,60,20,220,madame_broode.png
-2099,쿠파,Mario,3,Fire,1000,150,100,30,500,bowser.png
-3001,나몰빼미,Pokemon,1,Grass,80,25,10,15,20,rowlet.png
-3002,빼미스로우,Pokemon,2,Grass,120,40,20,20,40,dartrix.png
-3003,모크나이퍼,Pokemon,3,Grass,200,70,30,35,80,decidueye.png
-3004,냐오불,Pokemon,1,Fire,80,30,8,18,20,litten.png
-3005,냐오히트,Pokemon,2,Fire,120,45,15,25,40,torracat.png
-3006,어흥염,Pokemon,3,Fire,220,75,35,20,85,incineroar.png
-3007,리아코,Pokemon,1,Water,90,28,15,12,20,totodile.png
-3008,엘리게이,Pokemon,2,Water,130,42,25,18,40,croconaw.png
-3009,장크로다일,Pokemon,3,Water,240,65,45,15,85,feraligatr.png
-3010,피카츄,Pokemon,1,Electric,70,35,5,40,25,pikachu.png
-3011,라이츄,Pokemon,2,Electric,150,60,20,45,60,raichu.png
-3051,프리져,Pokemon,2,Water,350,70,40,30,150,articuno.png
-3052,썬더,Pokemon,2,Electric,340,80,30,50,150,zapdos.png
-3053,파이어,Pokemon,2,Fire,350,85,35,35,150,moltres.png
-3081,제크로무,Pokemon,3,Electric,550,110,60,40,300,zekrom.png
-3082,이벨타르,Pokemon,2,Star,580,100,50,45,320,yveltal.png
-3098,레쿠자,Pokemon,3,Wind,800,150,70,60,600,rayquaza.png
-3099,무한다이노,Pokemon,3,Star,1200,180,100,30,800,eternatus.png
-9001,화마,Final,3,Fire,600,120,50,50,300,wildfire.png
-9002,해일,Final,3,Water,650,110,60,45,300,tsunami.png
-9003,미세먼지,Final,3,Wind,550,90,40,70,300,dust.png
-9004,레고 지뢰,Final,3,Earth,400,200,150,20,350,lego_trap.png
-9005,충치균,Final,3,Grass,500,100,80,55,300,cavity.png
-9006,스마트폰 중독,Final,3,Electric,580,110,50,60,320,smartphone_monster.png
-9007,숙제 귀신,Final,3,Star,600,100,70,50,330,homework_ghost.png
-9090,어둠의 서호,Final,3,Star,2000,250,100,60,1000,dark_son.png
-9095,어둠의 아빠,Final,3,Electric,3000,300,150,55,2000,dark_dad.png
-9100,어둠의 엄마,Final,3,Star,5000,500,300,80,9999,dark_mom.png
+id,name,biome,tier,role,attribute,hp,atk,def,agi,exp_reward,image
+1001,하급 오니,DemonSlayer,1,MOB,Earth,30,8,2,8,5,oni_low.png
+1002,중급 오니,DemonSlayer,1,MOB,Wind,45,12,4,12,8,oni_mid.png
+1003,상급 오니,DemonSlayer,2,MOB,Electric,80,20,8,18,15,oni_high.png
+1004,거미 형,DemonSlayer,2,MOB,Poison,90,22,10,25,20,spider_brother.png
+1005,거미 누나,DemonSlayer,2,MOB,Wind,85,20,8,28,18,spider_sister.png
+1006,스사마루,DemonSlayer,2,MOB,Earth,100,25,8,30,22,susamaru.png
+1007,야하바,DemonSlayer,2,MOB,Wind,95,20,15,20,20,yahaba.png
+1011,하현6 카마누에,DemonSlayer,2,BOSS,Wind,120,25,10,20,40,kamanue.png
+1012,하현5 루이,DemonSlayer,2,BOSS,Grass,150,30,12,25,50,rui.png
+1013,하현4 무카고,DemonSlayer,2,BOSS,Earth,130,28,15,18,45,mukago.png
+1014,하현3 와쿠라바,DemonSlayer,2,BOSS,Wind,140,32,8,35,55,wakuraba.png
+1015,하현2 로쿠로,DemonSlayer,2,BOSS,Earth,160,35,20,15,60,rokuro.png
+1016,하현1 엔무,DemonSlayer,2,BOSS,Star,200,40,15,30,80,enmu.png
+1021,상현6 규타로,DemonSlayer,3,BOSS,Poison,300,50,25,40,150,gyutaro.png
+1022,상현5 굣코,DemonSlayer,3,BOSS,Water,350,60,30,35,180,gyokko.png
+1023,상현4 한텐구,DemonSlayer,3,BOSS,Wind,400,55,35,45,200,hantengu.png
+1024,상현3 아카자,DemonSlayer,3,BOSS,Fire,500,80,40,60,250,akaza.png
+1025,상현2 도우마,DemonSlayer,3,BOSS,Ice,600,90,45,55,300,douma.png
+1026,상현1 코쿠시보,DemonSlayer,3,BOSS,Moon,800,110,60,70,400,kokushibo.png
+1099,키부츠지 무잔,DemonSlayer,3,BOSS,Star,2000,200,100,80,999,muzan.png
+2001,굼바,Mario,1,MOB,Earth,25,6,1,5,4,goomba.png
+2002,엉금엉금,Mario,1,MOB,Water,35,10,8,8,6,koopa_troopa.png
+2003,헤이호,Mario,1,MOB,Fire,30,12,3,10,7,shy_guy.png
+2004,뻐끔플라워,Mario,2,MOB,Grass,70,25,5,5,20,piranha_plant.png
+2005,폭탄병,Mario,2,MOB,Fire,50,40,2,15,25,bob_omb.png
+2006,부끄부끄,Mario,2,MOB,Ghost,60,20,0,30,30,boo.png
+2010,와르르,Mario,3,MOB,Dark,100,35,20,20,40,dry_bones.png
+2011,마귀,Mario,3,BOSS,Psychic,150,50,15,45,70,kamek.png
+2020,쿠파 주니어,Mario,2,BOSS,Fire,200,60,30,50,120,bowser_jr.png
+2021,쿠파,Mario,3,BOSS,Fire,700,100,70,30,350,bowser.png
+3001,나몰빼미,Pokemon,1,MOB,Grass,40,12,5,15,10,rowlet.png
+3002,빼미스로우,Pokemon,2,MOB,Grass,90,30,15,20,30,dartrix.png
+3003,모크나이퍼,Pokemon,3,BOSS,Grass,180,60,25,35,70,decidueye.png
+3004,냐오불,Pokemon,1,MOB,Fire,45,15,4,18,12,litten.png
+3005,냐오히트,Pokemon,2,MOB,Fire,95,35,10,25,32,torracat.png
+3006,어흥염,Pokemon,3,BOSS,Fire,200,65,30,25,75,incineroar.png
+3007,리아코,Pokemon,1,MOB,Water,50,14,10,12,12,totodile.png
+3008,엘리게이,Pokemon,2,MOB,Water,100,32,20,18,35,croconaw.png
+3009,장크로다일,Pokemon,3,BOSS,Water,220,60,40,20,80,feraligatr.png
+3010,피카츄,Pokemon,1,MOB,Electric,35,20,3,35,15,pikachu.png
+3011,라이츄,Pokemon,2,BOSS,Electric,120,50,15,40,50,raichu.png
+3051,프리져,Pokemon,3,BOSS,Ice,400,80,50,60,250,articuno.png
+3052,썬더,Pokemon,3,BOSS,Electric,420,90,45,80,270,zapdos.png
+3053,파이어,Pokemon,3,BOSS,Fire,450,100,40,75,300,moltres.png
+3054,뮤츠,Pokemon,3,BOSS,Psychic,800,140,50,90,450,mewtwo.png
+9090,중간 보스,Final,3,BOSS,Dark,1500,120,80,70,800,mid_boss.png
+9095,진 중간 보스,Final,3,BOSS,Dark,2500,180,120,90,1500,true_mid_boss.png
+9100,마왕 무잔,Final,3,BOSS,Dark,5000,300,200,100,9999,muzan.png
