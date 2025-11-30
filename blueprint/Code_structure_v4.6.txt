@@ -1,0 +1,130 @@
+# DGFS 코드 구조 분석 (Ver 4.6)
+
+## 1. 프로젝트 아키텍처 (Project Architecture)
+
+이 프로젝트는 **Scene 기반 아키텍처**, **MVC 패턴**, 그리고 **컴포넌트 기반 UI 설계**를 결합하여 유지보수성과 확장성을 극대화했습니다.
+
+- **Scene Manager (`main.py`)**: 중앙 관제탑. `Scene` 객체를 교체하며 게임 상태를 전환합니다.
+- **데이터 주도 설계**: `data/`의 CSV로 밸런스를 잡고, `database.py`가 이를 SQLite로 관리합니다.
+- **관심사 분리 (SoC)**:
+    - **Model**: `game_systems/` (핵심 로직 & 데이터 처리)
+    - **View**: `ui/` (화면 렌더링 & 입력 감지/가공)
+    - **Controller**: `scenes/` (Model과 View를 연결하고 게임 흐름을 조율)
+
+## 2. UI/UX 계층 구조 (UI/UX Hierarchy)
+
+UI의 재사용성과 독립성을 높이기 위해 **컴포넌트 기반 설계**를 적극적으로 도입했습니다.
+
+### 2.1. 컴포넌트 및 팝업 시스템
+- **독립적 UI 객체**: `Button`뿐만 아니라 `CharacterCard`, `Popup` 등 복합적인 UI 요소를 자체적인 그리기 및 입력 처리 로직을 가진 별도 클래스로 분리했습니다.
+- **이벤트 블로킹 (Event Blocking)**: `Popup` 활성화 시 뒷배경(Scene)의 UI 요소가 클릭되지 않도록 입력을 차단하는 계층적 이벤트 처리 구조를 적용했습니다.
+
+### 2.2. 성장 데이터 표시 정책 (Growth Display Policy)
+- **영구 성장 (Permanent)**: 로비, 덱 정보 등 평시 상태에서는 DB에 저장된 캐릭터의 레벨과 경험치를 표시합니다.
+- **임시 성장 (Temporary)**: 등반(전투) 중에는 '영구 성장치' + '해당 세션에서 얻은 성장치'가 합산된 레벨과 스탯을 표시합니다.
+
+### 2.3. 사운드 시스템 (Sound System)
+- **중앙 관리 (Centralized Control)**: `AudioManager`가 싱글톤(Singleton)으로 구현되어 게임의 모든 사운드(BGM, SFX)를 전담합니다.
+- **음소거 기능 (Mute Functionality)**: `AudioManager` 내부에 `bgm_muted`, `sfx_muted` 상태 플래그를 두어, BGM과 SFX를 독립적으로 켜고 끌 수 있습니다.
+- **리소스 최적화 (Resource Optimization)**: BGM은 스트리밍 방식으로, SFX는 캐싱(Caching) 방식으로 재생하여 메모리 사용을 최적화합니다.
+
+## 3. 핵심 로직 흐름 (Core Logic Flow)
+
+### 3.1. 게임 시작 및 초기화
+- `main.py` 실행 → `config.py` 상수 로드 → `database.py` DB 초기화 → `LobbyScene` 표시
+
+### 3.2. 등반 및 전투 시스템 (Climb & Battle System)
+1. **데이터 계층**:
+    - `database.py`: 영구 데이터(캐릭터, 인벤토리, 재화) CRUD 담당.
+    - `fighter_data.py`: 캐릭터의 모든 데이터를 담는 순수 데이터 객체(DTO). 영구 스탯, 임시 스탯, 상태 등을 포함.
+2. **로직 계층**:
+    - `battle_system.py`: 단일 전투의 모든 규칙(명령 대기, 타겟팅, 턴 실행, 승/패 판정)을 처리하는 상태 기반 엔진.
+    - `level_manager.py`: 경험치 획득, 레벨업, 등급별 스탯 성장 등 캐릭터 성장과 관련된 모든 계산을 전담합니다.
+
+## 4. 주요 파일별 역할 (Detailed Roles)
+
+### 4.1. 최상위 및 공통 (Root & Common)
+- **`main.py`**: 게임의 메인 루프. Scene을 관리하고 전환하며, 공용 데이터(`shared_data`)를 각 Scene에 주입합니다.
+- **`database.py`**: 데이터베이스 연결, 테이블 생성, 캐릭터/인벤토리 CRUD 등 모든 DB 관련 함수를 제공하는 모듈.
+- **`config.py`**: 게임의 모든 상수(화면 크기, 색상, 경로, 밸런스 수치 등)를 정의하는 설정 파일.
+- **`test_setup.py`**: 테스트 환경을 설정하거나 테스트용 데이터를 생성/초기화하는 유틸리티 스크립트.
+
+### 4.2. 씬 컨트롤러 (Scene Controllers)
+- **`scenes/base_scene.py` [New]**: 모든 Scene 클래스가 상속받는 추상 베이스 클래스. `handle_events`, `update`, `draw` 등 Scene이 가져야 할 기본 인터페이스를 정의합니다.
+- **`scenes/lobby_scene.py`**: 메인 로비 화면. 다른 Scene(덱, 뽑기, 전투 시작 등)으로 전환하는 메뉴 버튼들을 관리합니다.
+- **`scenes/deck_scene.py` (Refactored & Stabilized)**
+    - **역할**: 보유한 모든 캐릭터를 확인하고 전투에 나설 2명의 '대표 캐릭터'를 선택하는 화면.
+    - **구조**: DB에서 캐릭터 목록을 불러와 `CharacterCard` 컴포넌트 리스트로 관리. 화면은 5열 그리드 레이아웃으로 구성되며, 마우스 휠로 스크롤 가능.
+    - **상호작용**: '상세' 버튼 클릭 시 `CharacterDetailPopup` 호출, '선택' 버튼 클릭 시 DB의 `is_selected` 상태를 직접 변경. 최대 2명까지만 선택되도록 로직을 통제.
+- **[Update]**: DB 조회 시 `sfx_type` 등 모든 캐릭터 데이터를 로드하도록 SQL 쿼리 수정.
+- **`scenes/gacha_scene.py`**
+    - 캐릭터 뽑기(Gacha) 연출과 결과를 담당. `GachaManager`를 호출하여 뽑기를 실행하고, 획득한 캐릭터 정보를 화면에 표시합니다.
+    - **[Update]**: 결과 화면 진입 시 `AudioManager.play_sfx`를 호출하여 1회/10회 소환 전용 효과음 재생.
+- **`scenes/coupon_scene.py` [New]**: 쿠폰 코드를 입력하는 화면. `InputBox`로 입력을 받고 `CouponManager`를 통해 코드 유효성 검사 및 보상 지급을 처리한 후 결과를 메시지로 표시.
+- **`scenes/battle_scene.py` (Controller & State Manager)**:
+    - **역할**: 전투의 전체 흐름을 지휘하는 총괄 컨트롤러. `BattleSystem`(Model)과 `BattleView`(View)를 중재.
+    - **세션 관리**: `StageManager`와 연동하여, 층 이동 시 `session_party_data`를 확인하고 전투 데이터를 로드(DB)할지, 유지(메모리)할지 결정.
+    - **상태 제어**: `BattleSystem`의 상태(`WAIT_FOR_ACTOR` 등)와 `BattleScene` 자체의 상태(`VICTORY`, `DEFEAT`)를 분리하여 관리.
+    - **입력 처리**: `BattleView`에서 가공된 사용자 입력(Action)을 받아 `BattleSystem`의 적절한 메서드(`select_actor_for_command` 등)를 호출.
+    - **[Update]**: 전투 시작 시, DB에서 로드한 `sfx_type` 등 모든 데이터를 `FighterData` 객체 생성 시 전달하도록 수정.
+
+### 4.3. UI/View 모듈 (UI/View Modules)
+- **`ui/background_manager.py`**: 게임의 모든 배경 이미지를 관리하고, 현재 씬이나 스테이지에 맞는 배경을 효율적으로 불러와 화면에 그립니다.
+- **`ui/components.py`**: 재사용 가능한 기본 UI 부품 모음. (`Button`, `InputBox`, `CharacterCard` 등)
+    - **`CharacterCard`**: 이미지 로딩 실패 시, 회색 사각형과 캐릭터 이름으로 구성된 Placeholder를 표시하는 방어 로직이 추가됨.
+    - **[Update]**: `Button.handle_event`에서 클릭 감지 시 `AudioManager.play_sfx('ui_click.wav')` 자동 호출.
+- **`ui/popup.py`**: 팝업창의 기본 기능(`BasePopup`)과 캐릭터 상세 정보를 보여주는 `CharacterDetailPopup`을 구현.
+- **`ui/fighter_view.py` [New]**: 전투 시 캐릭터(아군/적) 하나의 시각적 표현을 전담. 스프라이트 이미지 렌더링, 공격/피격/사망 애니메이션, 위치 이동 등을 관리.
+- **`ui/battle_panel.py` (Layout Refactored)**
+    - **역할**: 전투 화면 하단의 고정 정보 패널.
+    - **구조**: **3분할 레이아웃**으로 변경. [좌측: 아군 정보], [중앙: 커맨드 버튼], [우측: 적 정보]를 각각 표시.
+    - **아군 정보**: 최대 2명의 아군 정보를 좌/우 2열로 나누어 표시. 각 슬롯은 [이름/레벨], [HP/MP/SP 게이지], [스탯], [경험치 바]를 수직으로 포함.
+- **`ui/battle_view.py` [New]**: 전투 화면의 모든 시각적 요소를 총괄하는 '뷰 매니저'. 캐릭터(`FighterView`), 정보 패널(`BattlePanel`), 결과창(`RewardPopup`), 특수효과(`VFX`) 등을 조합하여 최종 화면을 그려냄. 사용자 입력을 1차 가공하여 `BattleScene`에 전달.
+    - **[New] 동적 사운드 분기**: `request_attack_sfx` 메소드를 통해, `fighter_data.sfx_type` 값과 행동 종류(공격/스킬/필살기)에 따라 다른 효과음을 다른 볼륨으로 재생.
+    - **[New] 사운드 제어 UI**: BGM/SFX 음소거를 위한 `ToggleButton`을 생성하고, 클릭 시 `AudioManager`의 `toggle` 메소드를 호출.
+- **`ui/vfx.py` [Refactored]**: 전투 중 발생하는 모든 시각 효과를 관리. 데미지/회복 수치를 보여주는 FloatingText와, 타격 이펙트 Placeholder인 HitEffect(빨간 사각형)를 포함.
+- **`ui/audio_manager.py` [Updated]**:
+  - **역할**: 게임의 모든 사운드(BGM, SFX)를 관리하는 싱글톤 클래스.
+  - **기능**:
+    - **`play_bgm(filename)`**: BGM 스트리밍 재생. 중복 재생 방지, 크로스페이드, 무한 반복 기능 포함.
+    - **`play_sfx(filename, volume)`**: 효과음 재생. 사운드 객체 캐싱, 볼륨 조절 기능 포함.
+    - **`toggle_bgm()` / `toggle_sfx()`**: BGM/SFX 음소거 상태를 토글. BGM은 `pause`/`unpause`를 사용.
+    - **예외 처리**: 모든 사운드 파일 부재 시, 게임이 멈추지 않도록 로그만 출력.
+
+### 4.4. 게임 시스템 (Game Systems / Model)
+- **`game_systems/fighter_data.py`**: 단일 캐릭터의 모든 데이터를 담는 클래스. 영구 스탯과 임시 스탯을 모두 포함하며, 전투 로직과 UI 표시에 필요한 모든 데이터를 제공하는 순수 데이터 모델.
+    - **[Update]**: `__init__` 및 `from_dict` 메서드에서 **`sfx_type`, `skill_name`, `ult_name`** 필드를 추가로 로드하고 저장.
+    - `sfx_type`의 기본값은 'NORMAL'로 처리하여 예외 방지.
+    - **[Fix]**: `use_skill` 메소드가 스킬 배율에 맞는 데미지를 반환하도록 수정.
+- `game_systems/battle_system.py`: (기존과 동일)
+- **`game_systems/level_manager.py`**: 경험치 획득, 레벨업 판정, 등급별 스탯 상승 등 캐릭터의 '성장'에 관한 모든 규칙과 계산을 담당하는 엔진.
+- **`game_systems/battle_system.py` (Battle Logic Engine)**:
+    - **역할**: 단일 전투의 핵심 로직을 담당하는 상태 기계. `pygame`에 의존하지 않음.
+    - **상태 관리**: `WAIT_FOR_ACTOR` → `COMMAND_INPUT` → `TARGET_SELECTION` → `BATTLE_EXECUTION` → `ROUND_OVER` 등의 상태를 통해 전투 흐름을 제어.
+    - **핵심 로직**: 턴 순서 결정(AGI 기반 정렬), 행동(공격/스킬) 실행, 데미지 계산, 승패 판정.
+    - **[Update]**: 행동 실행 전, `BattleView`에 `request_attack_sfx`를 요청하여 효과음을 재생하도록 수정.
+- **`game_systems/battle_data_handler.py` (Data I/O Specialist)**: 
+    - **책임**: 전투와 관련된 모든 데이터베이스 입출력을 전담.
+    - **데이터 로드 정책**: 
+        - **`_load_party_data`**: `inventory`와 `characters` 테이블을 `JOIN`하고 `COALESCE`를 사용하여 캐릭터의 '영구 성장 데이터'(레벨, 경험치, 스탯, `sfx_type` 등)를 정확히 로드.
+    - **데이터 저장 정책**:
+        - **`save_run_state`**: 등반 중 '이어하기'를 위해 캐릭터의 **임시 상태(`current_hp`, `current_mp`, `current_sp`)만** DB에 저장. 영구 스탯은 절대 건드리지 않음.
+- **`game_systems/gacha.py` [New]**: 캐릭터 뽑기 시스템의 확률 처리와 결과 생성을 담당. 설정된 확률에 따라 캐릭터를 추첨하고, 중복 획득 시 경험치 보상을 계산하는 등 뽑기 관련 모든 서버사이드 로직을 수행.
+- **`game_systems/coupon.py` [New]**: 쿠폰 코드의 유효성을 검증하고 보상을 지급하는 로직을 담당. 코드 형식, 발급자, 중복 사용 여부를 확인하여 DB를 업데이트.
+- **`game_systems/stage_manager.py` (Climb Session Manager)**: 
+    - **책임**: 100층 등반 콘텐츠의 구조(테마, 보스 등)와 세션 데이터, **환경 설정(BGM)**을 관리.
+    - **세션 데이터 유지 (`session_party_data`)**:
+        - 층 이동 간 파티 객체(`FighterData` 리스트)를 메모리에 보존하는 변수.
+        - `BattleScene`이 전투 승리 후 다음 층으로 넘어갈 때, 현재 파티의 `FighterData` 객체 리스트(사망자 포함)를 이곳에 저장.
+        - 다음 층의 `BattleScene`은 이 데이터가 존재하면 DB 로드를 건너뛰고, 메모리 상의 데이터를 그대로 사용하여 전투를 속행.
+    - **다이내믹 BGM 로직 [New]**:
+        - **`get_current_bgm_name(floor)` [New]**: 현재 층수와 바이옴 정보를 분석하여 상황에 맞는 BGM 파일명을 반환하는 책임을 가짐.
+        - **파일명 규칙**: `bgm_{theme}_t{tier}.mp3` (예: `bgm_mario_t1.mp3`) 형식 또는 `bgm_final.mp3` 등 정의된 규칙에 따라 정확한 파일명을 생성하여, `BattleScene`이 이를 `AudioManager`에 전달하도록 함.
+
+## 5. 트러블슈팅 가이드 (Troubleshooting Guide)
+- **팝업 뒤의 버튼이 눌린다**: `Scene`의 이벤트 처리 루프에서 `popup.handle_event`만 호출하고 즉시 `return`하는지 확인 (Event Blocking).
+- **경험치 바가 안 움직인다**: UI가 `fighter_data` 객체를 직접 참조하여 매 프레임 최신 `exp` 값을 가져오는지 확인 (변수에 값 복사 금지).
+- **등반 중 얻은 스탯이 영구 적용된다**: `battle_data_handler.save_run_state`가 영구 스탯(`total_max_hp` 등)을 업데이트하고 있는지 확인. 해당 함수는 `current_hp` 등 임시 상태만 저장해야 함.
+- **새로 시작해도 레벨이 1이다**: `battle_scene._place_party_fighters`에서 `FighterData` 생성 시 `level=data["level"]` 인자를 전달하는지, `battle_data_handler._load_party_data`가 DB에서 `level`을 제대로 읽어오는지 확인.
+- **글씨가 배경에 묻힌다**: 텍스트 뒤에 반투명한 어두운 배경 사각형을 그리거나, 폰트 색상에 테두리(outline) 효과를 추가하는 것을 고려.
+- **데이터가 꼬인다**: `fighter_data`가 올바른 시점(전투 시작/종료)에 초기화/리셋되는지, `database.py`의 트랜잭션(commit/rollback)이 올바르게 처리되는지 확인.

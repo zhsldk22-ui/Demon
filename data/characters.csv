@@ -1,39 +1,39 @@
-id,name,origin,grade,attribute,hp,mp,atk,def,agi,sp_max,description,image
-101,탄지로(물),DemonSlayer,Rare,Water,180,50,45,15,20,100,물의 호흡 제 1형!,tanjiro.png
-102,젠이츠,DemonSlayer,Common,Electric,140,40,35,10,30,100,벽력일섬!,zenitsu.png
-103,이노스케,DemonSlayer,Common,Earth,160,30,32,15,22,100,저돌맹진!,inosuke.png
-104,렌고쿠 쿄주로,DemonSlayer,Special,Fire,260,80,65,25,25,120,마음을 불태워라!,rengoku.png
-105,우즈이 텐겐,DemonSlayer,Rare,Wind,240,70,50,20,30,120,화려하게 가자!,tengen.png
-106,칸로지 미츠리,DemonSlayer,Common,Grass,200,60,40,15,25,120,사랑의 호흡!,mitsuri.png
-107,히메지마 교메이,DemonSlayer,Special,Earth,320,90,70,35,15,130,나무아미타불...,gyomei.png
-108,토기토 무이치로,DemonSlayer,Common,Wind,170,60,38,12,28,110,안개 호흡.,muichiro.png
-109,이구로 오바나이,DemonSlayer,Common,Water,180,65,39,15,26,110,뱀의 호흡.,obanai.png
-110,토미오카 기유,DemonSlayer,Special,Water,250,70,60,22,25,120,잔잔한 물결.,giyu.png
-111,코쵸우 시노부,DemonSlayer,Common,Grass,150,100,30,10,35,100,벌레의 호흡.,shinobu.png
-112,시나즈가와 사네미,DemonSlayer,Rare,Wind,230,75,55,20,28,120,바람의 호흡.,sanemi.png
-113,탄지로(히노카미),DemonSlayer,Legend,Star,350,120,85,35,35,150,해의 호흡!,tanjiro_sun.png
-201,마리오,Nintendo,Legend,Fire,330,100,80,30,30,150,이츠 미 마리오!,mario.png
-202,루이지,Nintendo,Special,Wind,240,80,55,20,28,120,마리오 형!,luigi.png
-203,와리오,Nintendo,Common,Earth,200,40,45,25,15,110,내가 최고야!,wario.png
-204,와리지,Nintendo,Common,Water,180,60,40,15,22,110,에헤헤!,waluigi.png
-205,피치공주,Nintendo,Special,Star,220,100,45,15,25,120,도와줘요 마리오!,peach.png
-206,요시,Nintendo,Rare,Grass,210,50,48,18,32,100,요시!,yoshi.png
-207,키노피오,Nintendo,Rare,Grass,180,40,42,15,35,80,반가워요!,toad.png
-301,이상해꽃,Pokemon,Rare,Grass,240,80,52,30,15,120,솔라빔!,venusaur.png
-302,리자몽,Pokemon,Rare,Fire,230,70,60,20,30,120,화염방사!,charizard.png
-303,거북왕,Pokemon,Rare,Water,250,60,48,35,18,120,하이드로펌프!,blastoise.png
-304,마스카나,Pokemon,Common,Grass,160,50,40,12,35,110,트릭플라워!,meowscarada.png
-305,라우드본,Pokemon,Common,Fire,200,60,45,25,10,110,플레어송!,skeledirge.png
-306,웨이니발,Pokemon,Common,Water,180,55,42,18,28,110,아쿠아스텝!,quaquaval.png
-307,치코리타,Pokemon,Common,Grass,150,40,30,20,20,90,잎날가르기!,chikorita.png
-308,에이스번,Pokemon,Common,Fire,170,50,45,15,32,110,화염볼!,cinderace.png
-309,누리네르,Pokemon,Common,Water,180,90,40,22,25,120,물거품아리아!,primarina.png
-310,뮤츠,Pokemon,Rare,Star,260,150,65,20,40,150,나는 누구인가.,mewtwo.png
-311,아르세우스,Pokemon,Legend,Star,400,200,95,50,45,200,창조신.,arceus.png
-312,지가르데,Pokemon,Special,Earth,300,100,70,45,20,160,질서의 수호자.,zygarde.png
-313,디아루가,Pokemon,Special,Electric,280,120,75,40,25,150,시간의 포효!,dialga.png
-314,펄기아,Pokemon,Special,Water,280,120,75,35,30,150,공간절단!,palkia.png
-315,기라티나,Pokemon,Special,Star,310,110,78,38,25,160,섀도우다이브!,giratina.png
-901,엄마,Family,Mythic,Star,500,500,100,50,50,300,공부 해!,mom.png
-902,아빠,Family,Mythic,Electric,450,300,95,45,45,250,코드 짜자!,dad.png
-903,아들,Family,Mythic,Fire,480,400,98,48,48,280,게임 할래!,son.png
+id,name,origin,grade,attribute,hp,mp,atk,def,agi,sp_max,description,image,sfx_type,skill_name,ult_name
+101,탄지로(물),DemonSlayer,Rare,Water,180,50,45,15,20,100,물의 호흡 제 1형!,tanjiro.png,SWORD,수면 베기,생생유전
+102,젠이츠,DemonSlayer,Common,Electric,140,40,35,10,30,100,벽력일섬!,zenitsu.png,SWORD,벽력일섬,화뇌신
+103,이노스케,DemonSlayer,Common,Earth,160,30,32,15,22,100,저돌맹진!,inosuke.png,SWORD,꿰뚫기,원전선치
+104,렌고쿠 쿄주로,DemonSlayer,Special,Fire,260,80,65,25,25,120,마음을 불태워라!,rengoku.png,SWORD,부지화,연옥
+105,우즈이 텐겐,DemonSlayer,Rare,Wind,240,70,50,20,30,120,화려하게 가자!,tengen.png,SWORD,굉,명현주
+106,칸로지 미츠리,DemonSlayer,Common,Grass,200,60,40,15,25,120,사랑의 호흡!,mitsuri.png,SWORD,초의 떨림,고양이 발 사랑 바람
+107,히메지마 교메이,DemonSlayer,Special,Earth,320,90,70,35,15,130,나무아미타불...,gyomei.png,SWORD,사문암 쌍극,유륜 돌기
+108,토기토 무이치로,DemonSlayer,Common,Wind,170,60,38,12,28,110,안개 호흡.,muichiro.png,SWORD,수천원하,몽롱
+109,이구로 오바나이,DemonSlayer,Common,Water,180,65,39,15,26,110,뱀의 호흡.,obanai.png,SWORD,위사 베기,원원장사
+110,토미오카 기유,DemonSlayer,Special,Water,250,70,60,22,25,120,잔잔한 물결.,giyu.png,SWORD,수면 베기,잔잔한 물결
+111,코쵸우 시노부,DemonSlayer,Common,Grass,150,100,30,10,35,100,벌레의 호흡.,shinobu.png,SWORD,나비의 춤,백족의 춤
+112,시나즈가와 사네미,DemonSlayer,Rare,Wind,230,75,55,20,28,120,바람의 호흡.,sanemi.png,SWORD,진선풍 깎기,이다천 태풍
+113,탄지로(히노카미),DemonSlayer,Legend,Star,350,120,85,35,35,150,해의 호흡!,tanjiro_sun.png,SWORD,원무,해의호흡 13형
+201,마리오,Nintendo,Legend,Fire,330,100,80,30,30,150,이츠 미 마리오!,mario.png,HIT,슈퍼 점프,파이어볼 난사
+202,루이지,Nintendo,Special,Wind,240,80,55,20,28,120,마리오 형!,luigi.png,HIT,진공 청소,고스트 버스터
+203,와리오,Nintendo,Common,Earth,200,40,45,25,15,110,내가 최고야!,wario.png,HIT,숄더 태클,와리오 방귀
+204,와리지,Nintendo,Common,Water,180,60,40,15,22,110,에헤헤!,waluigi.png,HIT,테니스 서브,장미의 춤
+205,피치공주,Nintendo,Special,Star,220,100,45,15,25,120,도와줘요 마리오!,peach.png,HIT,우산 치기,피치 블로썸
+206,요시,Nintendo,Rare,Grass,210,50,48,18,32,100,요시!,yoshi.png,HIT,알 낳기,슈퍼 드래곤
+207,키노피오,Nintendo,Rare,Grass,180,40,42,15,35,80,반가워요!,toad.png,HIT,박치기,거대 버섯
+301,이상해꽃,Pokemon,Rare,Grass,240,80,52,30,15,120,솔라빔!,venusaur.png,HIT,덩굴채찍,하드플랜트
+302,리자몽,Pokemon,Rare,Fire,230,70,60,20,30,120,화염방사!,charizard.png,HIT,불꽃세례,블러스트번
+303,거북왕,Pokemon,Rare,Water,250,60,48,35,18,120,하이드로펌프!,blastoise.png,HIT,물대포,하이드로캐논
+304,마스카나,Pokemon,Common,Grass,160,50,40,12,35,110,트릭플라워!,meowscarada.png,HIT,나뭇잎,트릭플라워
+305,라우드본,Pokemon,Common,Fire,200,60,45,25,10,110,플레어송!,skeledirge.png,HIT,불꽃,플레어송
+306,웨이니발,Pokemon,Common,Water,180,55,42,18,28,110,아쿠아스텝!,quaquaval.png,HIT,물총,아쿠아스텝
+307,메가니움,Pokemon,Common,Grass,150,40,30,20,20,90,잎날가르기!,meganium.png,HIT,잎날가르기,하드플랜트
+308,에이스번,Pokemon,Common,Fire,170,50,45,15,32,110,화염볼!,cinderace.png,HIT,불꽃세례,화염볼
+309,누리네르,Pokemon,Common,Water,180,90,40,22,25,120,물거품아리아!,primarina.png,HIT,물대포,물거품아리아
+310,뮤츠,Pokemon,Rare,Star,260,150,65,20,40,150,나는 누구인가.,mewtwo.png,HIT,염동력,사이코브레이크
+311,아르세우스,Pokemon,Legend,Star,400,200,95,50,45,200,창조신.,arceus.png,HIT,스피드스타,심판의뭉치
+312,지가르데,Pokemon,Special,Earth,300,100,70,45,20,160,질서의 수호자.,zygarde.png,HIT,땅고르기,그라운드포스
+313,디아루가,Pokemon,Special,Electric,280,120,75,40,25,150,시간의 포효!,dialga.png,HIT,메탈크로우,시간의포효
+314,펄기아,Pokemon,Special,Water,280,120,75,35,30,150,공간절단!,palkia.png,HIT,물파동,공간절단
+315,기라티나,Pokemon,Special,Star,310,110,78,38,25,160,섀도우다이브!,giratina.png,HIT,섀도크루,섀도다이브
+901,엄마,Family,Mythic,Star,500,500,100,50,50,300,공부 해!,mom.png,HIT,서호야,손넣지마!
+902,아빠,Family,Mythic,Electric,450,300,95,45,45,250,코드 짜자!,dad.png,HIT,박서호,같이잘래?
+903,아들,Family,Mythic,Fire,480,400,98,48,48,280,게임 할래!,son.png,HIT,게임하자,손넣을께!
